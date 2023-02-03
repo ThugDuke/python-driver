@@ -536,6 +536,7 @@ class BaseConnectionTestNoDefault(object):
         test_queryset.TestModel.__queryset__ = ModelQuerySetNew
         test_queryset.IndexedTestModel.__queryset__ = ModelQuerySetNew
         test_queryset.CustomIndexedTestModel.__queryset__ = ModelQuerySetNew
+        test_queryset.CustomSASIIndexedTestModel.__queryset__ = ModelQuerySetNew
         test_queryset.IndexedCollectionsTestModel.__queryset__ = ModelQuerySetNew
         test_queryset.TestMultiClusteringModel.__queryset__ = ModelQuerySetNew
 

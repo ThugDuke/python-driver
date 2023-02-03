@@ -287,6 +287,22 @@ def _sync_table(model, connection=None):
         qs = ' '.join(qs)
         execute(qs, connection=connection)
 
+    custom_indexes = [c for n, c in model._columns.items() if c.custom_index and c.custom_index_using is not None]
+
+    for column in custom_indexes:
+        index_name = _get_index_name_by_column(table, column.db_field_name)
+        if index_name:
+            continue
+
+        qs = ['CREATE CUSTOM INDEX']
+        qs += ['ON {0}'.format(cf_name)]
+        qs += ['("{0}")'.format(column.db_field_name)]
+        qs += ["USING '{0}'".format(column.custom_index_using)]
+        if column.custom_index_options:
+            qs += ['WITH OPTIONS = {0}'.format(column.custom_index_options)]
+        qs = ' '.join(qs)
+        execute(qs, connection=connection)
+
 
 def _validate_pk(model, table_meta):
     model_partition = [c.db_field_name for c in model._partition_keys.values()]

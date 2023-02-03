@@ -121,6 +121,16 @@ class Column(object):
     indexes.
     """
 
+    custom_index_using = None
+    """
+    specify the index this field is using
+    """
+
+    custom_index_options = None
+    """
+    define options in dict for the custom index
+    """
+
     db_field = None
     """
     the fieldname this field will map to in the database
@@ -169,11 +179,15 @@ class Column(object):
                  clustering_order=None,
                  discriminator_column=False,
                  static=False,
-                 custom_index=False):
+                 custom_index=False,
+                 custom_index_using=None,
+                 custom_index_options=None):
         self.partition_key = partition_key
         self.primary_key = partition_key or primary_key
         self.index = index
         self.custom_index = custom_index
+        self.custom_index_using = custom_index_using
+        self.custom_index_options = custom_index_options
         self.db_field = db_field
         self.default = default
         self.required = required

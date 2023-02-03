@@ -87,6 +87,18 @@ class CustomIndexedTestModel(Model):
     data = columns.Text()
 
 
+class CustomSASIIndexedTestModel(Model):
+
+    test_id = columns.Integer(primary_key=True)
+    description = columns.Text(
+        custom_index=True,
+        custom_index_using='org.apache.cassandra.index.sasi.SASIIndex',
+        custom_index_options={'mode': 'CONTAINS'}
+    )
+    indexed = columns.Text(index=True)
+    data = columns.Text()
+
+
 class IndexedCollectionsTestModel(Model):
 
     test_id = columns.Integer(primary_key=True)
@@ -320,10 +332,12 @@ class BaseQuerySetUsage(BaseCassEngTestCase):
         drop_table(TestModel)
         drop_table(IndexedTestModel)
         drop_table(CustomIndexedTestModel)
+        drop_table(CustomSASIIndexedTestModel)
 
         sync_table(TestModel)
         sync_table(IndexedTestModel)
         sync_table(CustomIndexedTestModel)
+        sync_table(CustomSASIIndexedTestModel)
         sync_table(TestMultiClusteringModel)
 
         TestModel.objects.create(test_id=0, attempt_id=0, description='try1', expected_result=5, test_result=30)
@@ -382,6 +396,7 @@ class BaseQuerySetUsage(BaseCassEngTestCase):
         drop_table(TestModel)
         drop_table(IndexedTestModel)
         drop_table(CustomIndexedTestModel)
+        drop_table(CustomSASIIndexedTestModel)
         drop_table(TestMultiClusteringModel)
 
 
@@ -778,6 +793,14 @@ class TestQuerySetValidation(BaseQuerySetUsage):
 
         list(CustomIndexedTestModel.objects.filter(description='test'))
         list(CustomIndexedTestModel.objects.filter(test_id=1, description='test'))
+
+    def test_custom_sasi_indexed_field_can_be_queried(self):
+        """
+        Tests that queries with PREFIX and CONTAINS on an custom sasi indexed field
+        """
+
+        list(CustomSASIIndexedTestModel.objects.filter(description__like='test'))
+        list(CustomSASIIndexedTestModel.objects.filter(test_id=1, description__like='test'))
 
 
 class TestQuerySetDelete(BaseQuerySetUsage):
